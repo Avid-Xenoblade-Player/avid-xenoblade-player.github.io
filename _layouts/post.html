@@ -24,8 +24,9 @@ layout: default
     if (!postBody) return
     let html = postBody.innerHTML;
 
-    html = html.replace(/\[([^\]|]+)\|([^\]]+)\]/g, function(match, text, url) {
+    html = html.replace(/\[([^\]|]+)\|([^\]\s<]+)\]/g, function(match, text, url) {
       let href = url.trim();
+      href = href.replace(/<[^>]*>/g, ''); 
       if (!/^https?:\/\//i.test(href) && !href.startsWith('/')) {
         href = 'https://' + href;
       }
