@@ -15,3 +15,31 @@ layout: default
 
   {% include disqus.html %}
 </article>
+
+<script src="https://jsdelivr.net" id="MathJax-script" async></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const postBody = document.querySelector(".entry");
+    if (!postBody) return
+    let html = postBody.innerHTML;
+
+    html = html.replace(/\[([^\]|]+)\|([^\]]+)\]/g, function(match, text, url) {
+      let href = url.trim();
+      if (!/^https?:\/\//i.test(href) && !href.startsWith('/')) {
+        href = 'https://' + href;
+      }
+      return `<a href="${href}" class="mediawiki-link">${text.trim()}</a>`;
+    });
+
+    html = html.replace(/==([^=]+)==/g, '<mark class="wiki-highlight">$1</mark>');
+
+    html = html.replace(/(?<!https?:)\/([^\/\s][^\/]*?[^\/\s]|[^\/\s])\//g, '<em>$1</em>');
+
+    postBody.innerHTML = html;
+
+    if (window.MathJax) {
+      window.MathJax.typesetPromise([postBody]);
+    }
+  });
+</script>
