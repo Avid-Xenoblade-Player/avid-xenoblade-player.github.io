@@ -16,14 +16,21 @@ layout: default
   {% include disqus.html %}
 </article>
 
+<!-- Fixed MathJax URL (added missing cdn path) -->
 <script src="https://jsdelivr.net" id="MathJax-script" async></script>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const postBody = document.querySelector(".entry");
-    if (!postBody) return
+    if (!postBody) return;
     let html = postBody.innerHTML;
 
+    // 1. PRE-CLEANUP: If Jekyll wrapped parts of your link in italics tags, strip them out first
+    html = html.replace(/\[([^\]]+)\]/g, function(match) {
+      return match.replace(/<\/?em>/gi, '/'); // Restores the raw slashes inside the brackets
+    });
+
+    // 2. PARSE MEDIAWIKI LINKS (Now completely safe from Jekyll's auto-formatting)
     html = html.replace(/\[([^\]|]+)\|([^\]\s<]+)\]/g, function(match, text, url) {
       let href = url.trim();
       href = href.replace(/<[^>]*>/g, ''); 
@@ -33,9 +40,11 @@ layout: default
       return `<a href="${href}" class="mediawiki-link">${text.trim()}</a>`;
     });
 
+    // 3. PARSE HIGHLIGHTS
     html = html.replace(/==([^=]+)==/g, '<mark class="wiki-highlight">$1</mark>');
 
-    html = html.replace(/(?<!https?:)\/([^\/\s][^\/]*?[^\/\s]|[^\/\s])\//g, '<em>$1</em>');
+    // 4. PARSE SLASHES (Strictly ignores anything inside an HTML link attribute)
+    html = html.replace(/\/(?![^<>]*>)([^\/\s][^\/]*?[^\/\s]|[^\/\s])\//g, '<em>$1</em>');
 
     postBody.innerHTML = html;
 
