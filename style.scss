@@ -339,6 +339,590 @@ footer {
 	color: #787878;
 	font-weight: bold;
 }
+
+/********************************/
+/* VERSION 3 POST LAYOUT SYSTEM */
+/********************************/
+
+.v3-blog-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 40px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 20px auto 0;
+  box-sizing: border-box;
+}
+
+.v3-main {
+  min-width: 0;
+}
+
+.v3-article {
+  max-width: 800px;
+  margin: 0 auto;
+  overflow-wrap: break-word;
+  line-height: 1.7;
+}
+
+/* ARTICLE HEADER */
+
+.v3-header {
+  border-bottom: 1px solid $lightGray;
+  padding-bottom: 22px;
+  margin-bottom: 28px;
+}
+
+.v3-category-label {
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: $gray;
+  margin-bottom: 8px;
+
+  a {
+    color: $blue;
+  }
+}
+
+.v3-title {
+  font-size: 34px;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  color: $darkerGray;
+  overflow-wrap: break-word;
+
+  @include mobile {
+    font-size: 28px;
+  }
+}
+
+.v3-subtitle {
+  font-size: 1.1em;
+  color: $gray;
+  margin: 0 0 15px;
+  line-height: 1.5;
+}
+
+.v3-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 16px;
+  font-size: 0.78em;
+  color: $gray;
+
+  strong {
+    color: $darkGray;
+  }
+}
+
+.v3-tags,
+.v3-footer-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 15px;
+}
+
+.v3-tag,
+.v3-footer-tags a {
+  display: inline-block;
+  background: $lightGray;
+  color: $darkGray;
+  padding: 3px 9px;
+  border-radius: 3px;
+  font-size: 0.78em;
+
+  &:hover {
+    color: $blue;
+  }
+}
+
+/* TABLE OF CONTENTS */
+
+.v3-toc {
+  background: $lightGray;
+  border: 1px solid darken($lightGray, 5%);
+  border-radius: 4px;
+  padding: 12px 18px;
+  margin-bottom: 30px;
+  font-size: 0.88em;
+
+  &[hidden] {
+    display: none;
+  }
+
+  summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: $darkerGray;
+  }
+
+  ol {
+    margin: 10px 0 0;
+    padding-left: 24px;
+  }
+
+  li {
+    margin: 5px 0;
+  }
+
+  a {
+    color: $darkGray;
+
+    &:hover {
+      color: $blue;
+    }
+  }
+
+  .v3-toc-subheading {
+    margin-left: 18px;
+    list-style-type: circle;
+  }
+}
+
+/* ARTICLE BODY */
+
+.v3-entry {
+  min-width: 0;
+  overflow-wrap: break-word;
+
+  h2,
+  h3,
+  h4 {
+    scroll-margin-top: 25px;
+  }
+
+  h2 {
+    border-bottom: 1px solid $lightGray;
+    padding-bottom: 7px;
+    margin-top: 1.8em;
+  }
+
+  h3 {
+    margin-top: 1.5em;
+  }
+
+  p {
+    margin: 15px 0;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  figure {
+    margin: 25px auto;
+    text-align: center;
+
+    img {
+      display: block;
+      margin: 0 auto;
+    }
+  }
+
+  figcaption {
+    color: $gray;
+    font-size: 0.85em;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  blockquote {
+    margin: 25px 0;
+    border-left: 3px solid $blue;
+    padding: 8px 18px;
+    color: $gray;
+    font-size: 1em;
+    font-style: italic;
+    background: $lightGray;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    display: block;
+    overflow-x: auto;
+  }
+
+  th,
+  td {
+    border: 1px solid darken($lightGray, 8%);
+    padding: 9px 12px;
+    text-align: left;
+  }
+
+  th {
+    background: $lightGray;
+    color: $darkerGray;
+  }
+
+  pre {
+    overflow-x: auto;
+    padding: 15px;
+    background: $lightGray;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+
+  code {
+    font-size: 0.9em;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid $lightGray;
+    margin: 35px 0;
+  }
+
+  mark,
+  .v3-highlight {
+    background: #fff2a8;
+    color: inherit;
+    padding: 1px 3px;
+  }
+
+  .footnotes {
+    border-top: 1px solid $lightGray;
+    margin-top: 40px;
+    padding-top: 15px;
+    color: $gray;
+    font-size: 0.88em;
+  }
+
+  sup {
+    line-height: 0;
+  }
+
+  .footnote {
+    padding: 0 2px;
+  }
+}
+
+/* MEDIAWIKI RESOURCE CARDS */
+
+.v3-resource-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid $lightGray;
+  border-left: 4px solid $blue;
+  background: lighten($lightGray, 3%);
+
+  strong {
+    color: $darkerGray;
+    font-size: 1.05em;
+  }
+
+  span {
+    color: $gray;
+    font-size: 0.9em;
+    font-style: italic;
+  }
+
+  .v3-resource-link {
+    align-self: flex-start;
+    margin-top: 5px;
+  }
+}
+
+.v3-mediawiki-link {
+  color: $blue;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ARTICLE FOOTER */
+
+.v3-footer {
+  border-top: 1px solid $lightGray;
+  padding-top: 20px;
+  margin-top: 45px;
+}
+
+.v3-navigation {
+  margin-top: 28px;
+
+  h3 {
+    font-size: 1em;
+    margin: 0 0 12px;
+  }
+}
+
+.v3-navigation-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+
+  a {
+    color: $blue;
+    font-size: 0.9em;
+  }
+}
+
+.v3-nav-right {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.v3-nav-label {
+  color: $gray;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.v3-nav-disabled {
+  color: $gray;
+  font-size: 0.85em;
+}
+
+/* SIDEBAR */
+
+.v3-sidebar {
+  min-width: 0;
+  border-left: 1px solid $lightGray;
+  padding-left: 22px;
+}
+
+.v3-sidebar-inner {
+  position: sticky;
+  top: 20px;
+}
+
+.v3-sidebar-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $lightGray;
+  font-weight: bold;
+  font-size: 1.05em;
+
+  button {
+    display: none;
+  }
+}
+
+.v3-widget {
+  margin: 24px 0;
+
+  h3 {
+    font-size: 0.9em;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.v3-widget-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid $lightGray;
+    font-size: 0.85em;
+  }
+
+  a {
+    color: $darkGray;
+
+    &:hover {
+      color: $blue;
+    }
+  }
+
+  span {
+    color: $gray;
+  }
+}
+
+/* SEARCH */
+
+#v3-search {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border: 1px solid darken($lightGray, 8%);
+  border-radius: 3px;
+  background: $white;
+  color: $darkGray;
+  font: inherit;
+  font-size: 0.85em;
+
+  &:focus {
+    outline: 2px solid $blue;
+    outline-offset: 1px;
+  }
+}
+
+#v3-search-results {
+  margin-top: 10px;
+  font-size: 0.85em;
+  color: $gray;
+}
+
+.v3-search-result {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 0;
+  border-bottom: 1px solid $lightGray;
+  color: $darkGray;
+
+  strong {
+    color: $blue;
+  }
+
+  span {
+    color: $gray;
+    font-size: 0.85em;
+  }
+}
+
+/* MOBILE SIDEBAR CONTROL */
+
+.v3-menu-button {
+  display: none;
+}
+
+.v3-sidebar-overlay {
+  display: none;
+}
+
+/* RESPONSIVE LAYOUT */
+
+@include mobile {
+
+  .v3-blog-layout {
+    display: block;
+    padding: 0 10px;
+    margin-top: 15px;
+  }
+
+  .v3-main {
+    width: 100%;
+  }
+
+  .v3-article {
+    max-width: none;
+  }
+
+  .v3-menu-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 13px;
+    margin-bottom: 20px;
+    border: 1px solid $lightGray;
+    border-radius: 4px;
+    background: $white;
+    color: $darkGray;
+    font: inherit;
+    font-size: 0.85em;
+    cursor: pointer;
+  }
+
+  .v3-sidebar {
+    position: fixed;
+    z-index: 1001;
+    top: 0;
+    right: 0;
+    width: min(310px, 85vw);
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 20px;
+    background: $white;
+    border-left: 1px solid $lightGray;
+    transform: translateX(105%);
+    transition: transform 0.25s ease;
+  }
+
+  .v3-sidebar-open {
+    transform: translateX(0);
+  }
+
+  .v3-sidebar-inner {
+    position: static;
+  }
+
+  .v3-sidebar-heading button {
+    display: block;
+    border: 0;
+    background: transparent;
+    color: $darkGray;
+    font-size: 1.5em;
+    cursor: pointer;
+  }
+
+  .v3-sidebar-overlay {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .v3-overlay-visible {
+    display: block;
+  }
+
+  .v3-navigation-grid {
+    gap: 10px;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .v3-metadata {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .v3-navigation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .v3-nav-right {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .v3-sidebar {
+    transition: none;
+  }
+
+}
 // Settled on moving the import of syntax highlighting to the bottom of the CSS
 // ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start
 @import "highlights";
