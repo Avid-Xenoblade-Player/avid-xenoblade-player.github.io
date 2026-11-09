@@ -377,9 +377,9 @@ document.addEventListener("DOMContentLoaded", function () {
      1. MEDIAWIKI-STYLE SYNTAX
   ----------------------------- */
 
-  const syntaxPattern =
-    /\[([^\]|]+)\|([^\]|]+)\|([^\]\s<]+)\]|\[([^\]|]+)\|([^\]\s<]+)\]|==([^=]+)==|'''([^']+)'''|__([^_]+)__|\/(?![^\/\s])([^\/]+?)\/|\/([^\/\s](?:[^\/]*?[^\/\s])?)\//g;
-
+const syntaxPattern =
+  /\[([^\]|]+)\|([^\]|]+)\|([^\]\s<]+)\]|\[([^\]|]+)\|([^\]\s<]+)\]|==([^=]+)==|'''([^']+)'''|__([^_]+)__|\/([^\/\s](?:[^\/]*?[^\/\s])?)\//g;
+  
   function makeLink(text, url) {
     const link = document.createElement("a");
     link.textContent = text.trim();
