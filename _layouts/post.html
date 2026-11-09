@@ -1,149 +1,832 @@
 ---
 layout: default
 ---
-<div class="blog-layout-wrapper">
 
-  <!-- MAIN POST ARTICLE PANEL -->
-  <main class="main-content-panel">
-    <article class="post">
-      <h1 style="font-size: 30px; margin-top: 0; margin-bottom: 5px; line-height: 1.2;">{{ page.title }}</h1>
+{% assign current_category = page.categories[0] %}
+{% assign author_name = page.author | default: site.author.name | default: site.author | default: "Unknown author" %}
+{% assign modified_date = page.last_modified_at %}
+{% assign category_posts = site.categories[current_category] %}
 
-      <div class="date">
-        Written on {{ page.date | date: "%B %e, %Y" }}
-      </div>
-      
-      <div class="entry">
+{% assign chronological_prev = nil %}
+{% assign chronological_next = nil %}
+{% assign category_prev = nil %}
+{% assign category_next = nil %}
+
+{% comment %} Global chronological navigation {% endcomment %}
+{% for post in site.posts %}
+  {% if post.url == page.url %}
+    {% assign older_index = forloop.index0 | plus: 1 %}
+    {% assign newer_index = forloop.index0 | minus: 1 %}
+
+    {% if older_index != site.posts.size %}
+      {% assign chronological_prev = site.posts[older_index] %}
+    {% endif %}
+
+    {% if forloop.first == false %}
+      {% assign chronological_next = site.posts[newer_index] %}
+    {% endif %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} Category-specific navigation {% endcomment %}
+{% if current_category %}
+  {% for post in category_posts %}
+    {% if post.url == page.url %}
+      {% assign older_index = forloop.index0 | plus: 1 %}
+      {% assign newer_index = forloop.index0 | minus: 1 %}
+
+      {% if older_index != category_posts.size %}
+        {% assign category_prev = category_posts[older_index] %}
+      {% endif %}
+
+      {% if forloop.first == false %}
+        {% assign category_next = category_posts[newer_index] %}
+      {% endif %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<div class="v3-blog-layout">
+
+  <button
+    class="v3-menu-button"
+    id="v3-menu-button"
+    aria-label="Open sidebar"
+    aria-expanded="false"
+    aria-controls="v3-sidebar">
+    <span aria-hidden="true">☰</span>
+    <span>Explore and navigate</span>
+  </button>
+
+  <div class="v3-sidebar-overlay" id="v3-sidebar-overlay"></div>
+
+  <!-- MAIN ARTICLE -->
+
+  <main class="v3-main">
+    <article class="v3-article">
+
+      <header class="v3-header">
+
+        <div class="v3-category-label">
+          {% if page.categories.size > 0 %}
+            {% for category in page.categories %}
+              <a href="{{ site.baseurl }}/blog.html?category={{ category | url_encode }}">
+                {{ category }}
+              </a>{% unless forloop.last %}<span> / </span>{% endunless %}
+            {% endfor %}
+          {% else %}
+            <span>Uncategorised</span>
+          {% endif %}
+        </div>
+
+        <h1 class="v3-title">{{ page.title | escape }}</h1>
+
+        {% if page.subtitle %}
+          <p class="v3-subtitle">{{ page.subtitle | escape }}</p>
+        {% endif %}
+
+        <div class="v3-metadata">
+          <span>By <strong>{{ author_name }}</strong></span>
+
+          <span>
+            Published {{ page.date | date: "%-d %B %Y" }}
+          </span>
+
+          {% if modified_date %}
+            <span>
+              Updated {{ modified_date | date: "%-d %B %Y" }}
+            </span>
+          {% endif %}
+
+          <span id="v3-reading-time">Calculating reading time...</span>
+
+          <span id="v3-reading-difficulty">
+            Calculating complexity...
+          </span>
+        </div>
+
+        {% if page.tags.size > 0 %}
+          <div class="v3-tags">
+            {% for tag in page.tags %}
+              <a
+                href="{{ site.baseurl }}/blog.html?tag={{ tag | url_encode }}"
+                class="v3-tag">
+                #{{ tag }}
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+      </header>
+
+      <!-- TABLE OF CONTENTS -->
+
+      <section class="v3-toc" id="v3-toc">
+        <details open>
+          <summary>Contents</summary>
+          <ol id="v3-toc-list"></ol>
+        </details>
+      </section>
+
+      <!-- ARTICLE BODY -->
+
+      <div class="v3-entry entry" id="v3-entry">
         {{ content }}
       </div>
 
-      <!-- CATEGORY-ISOLATED CHRONOLOGICAL NAVIGATION -->
-      {% assign current_category = page.categories[0] %}
-      {% if current_category %}
-        {% assign filtered_posts = site.categories[current_category] %}
-        {% for post in filtered_posts %}
-          {% if post.url == page.url %}
-            {% assign prev_idx = forloop.index0 | plus: 1 %}
-            {% assign next_idx = forloop.index0 | minus: 1 %}
-            
-            {% if forloop.last == false %}
-              {% assign prev_post = filtered_posts[prev_idx] %}
-            {% endif %}
-            {% if forloop.first == false %}
-              {% assign next_post = filtered_posts[next_idx] %}
-            {% endif %}
-            {% break %}
-          {% endif %}
-        {% endfor %}
-      {% endif %}
+      <!-- ARTICLE FOOTER -->
 
-      <div class="PageNavigation" style="display: flex; justify-content: space-between; margin: 40px 0; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.9em;">
-        {% if prev_post %}
-          <a class="prev" href="{{ site.baseurl }}{{ prev_post.url }}" style="color: #007acc; font-weight: 500;">&laquo; Older in {{ current_category | capitalize }}: {{ prev_post.title }}</a>
-        {% else if current_category %}
-          <span style="color: #ccc;">&laquo; Oldest in {{ current_category | capitalize }}</span>
-        {% else %}
-          <span style="color: #ccc;">&laquo; Oldest Post</span>
+      <footer class="v3-footer">
+
+        {% if page.tags.size > 0 %}
+          <div class="v3-footer-tags">
+            <strong>Filed under:</strong>
+            {% for tag in page.tags %}
+              <a href="{{ site.baseurl }}/blog.html?tag={{ tag | url_encode }}">
+                #{{ tag }}
+              </a>
+            {% endfor %}
+          </div>
         {% endif %}
 
-        {% if next_post %}
-          <a class="next" href="{{ site.baseurl }}{{ next_post.url }}" style="color: #007acc; font-weight: 500;">Newer in {{ current_category | capitalize }}: {{ next_post.title }} &raquo;</a>
-        {% else if current_category %}
-          <span style="color: #ccc;">Newest in {{ current_category | capitalize }} &raquo;</span>
-        {% else %}
-          <span style="color: #ccc;">Newest Post &raquo;</span>
+        <!-- GLOBAL CHRONOLOGICAL NAVIGATION -->
+
+        <section class="v3-navigation">
+          <h3>All posts</h3>
+
+          <div class="v3-navigation-grid">
+
+            <div>
+              {% if chronological_prev %}
+                <span class="v3-nav-label">Older post</span>
+                <a href="{{ site.baseurl }}{{ chronological_prev.url }}">
+                  &laquo; {{ chronological_prev.title }}
+                </a>
+              {% else %}
+                <span class="v3-nav-disabled">Oldest post</span>
+              {% endif %}
+            </div>
+
+            <div class="v3-nav-right">
+              {% if chronological_next %}
+                <span class="v3-nav-label">Newer post</span>
+                <a href="{{ site.baseurl }}{{ chronological_next.url }}">
+                  {{ chronological_next.title }} &raquo;
+                </a>
+              {% else %}
+                <span class="v3-nav-disabled">Newest post</span>
+              {% endif %}
+            </div>
+
+          </div>
+        </section>
+
+        <!-- CATEGORY NAVIGATION -->
+
+        {% if current_category %}
+          <section class="v3-navigation">
+            <h3>
+              More in
+              <a href="{{ site.baseurl }}/blog.html?category={{ current_category | url_encode }}">
+                {{ current_category }}
+              </a>
+            </h3>
+
+            <div class="v3-navigation-grid">
+
+              <div>
+                {% if category_prev %}
+                  <span class="v3-nav-label">Older in category</span>
+                  <a href="{{ site.baseurl }}{{ category_prev.url }}">
+                    &laquo; {{ category_prev.title }}
+                  </a>
+                {% else %}
+                  <span class="v3-nav-disabled">Oldest in category</span>
+                {% endif %}
+              </div>
+
+              <div class="v3-nav-right">
+                {% if category_next %}
+                  <span class="v3-nav-label">Newer in category</span>
+                  <a href="{{ site.baseurl }}{{ category_next.url }}">
+                    {{ category_next.title }} &raquo;
+                  </a>
+                {% else %}
+                  <span class="v3-nav-disabled">Newest in category</span>
+                {% endif %}
+              </div>
+
+            </div>
+          </section>
         {% endif %}
-      </div>
-      
-      {% include disqus.html %}
+
+      </footer>
+
     </article>
   </main>
 
-  <!-- SIDEBAR WIDGET SYSTEM -->
-  <aside class="sidebar-widgets">
-    <section class="widget-item">
-      <h3 style="border-bottom: 2px solid #007acc; padding-bottom: 6px; margin: 0; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px;">Categories</h3>
-      <ul class="widget-list">
-        {% if site.categories.size > 0 %}
+  <!-- SIDEBAR -->
+
+  <aside class="v3-sidebar" id="v3-sidebar">
+
+    <div class="v3-sidebar-inner">
+
+      <div class="v3-sidebar-heading">
+        <span>Explore</span>
+        <button id="v3-sidebar-close" aria-label="Close sidebar">
+          &times;
+        </button>
+      </div>
+
+      <!-- SEARCH -->
+
+      <section class="v3-widget">
+        <h3>Search</h3>
+
+        <form id="v3-search-form">
+          <input
+            type="search"
+            id="v3-search"
+            placeholder="Search posts..."
+            aria-label="Search posts"
+          >
+        </form>
+
+        <div id="v3-search-results" aria-live="polite"></div>
+      </section>
+
+      <!-- CATEGORIES -->
+
+      <section class="v3-widget">
+        <h3>Categories</h3>
+
+        <ul class="v3-widget-list">
           {% for category in site.categories %}
             <li>
-              <span>{{ category[0] }}</span>
-              <span class="widget-count-badge">{{ category[1].size }}</span>
+              <a href="{{ site.baseurl }}/blog.html?category={{ category[0] | url_encode }}">
+                {{ category[0] }}
+              </a>
+              <span>{{ category[1].size }}</span>
             </li>
           {% endfor %}
-        {% else %}
-          <li style="color: #999; font-style: italic; font-size: 0.9em; padding-left: 5px;">No categories assigned</li>
-        {% endif %}
-      </ul>
-    </section>
+        </ul>
+      </section>
 
-    <section class="widget-item">
-      <h3 style="border-bottom: 2px solid #007acc; padding-bottom: 6px; margin: 0; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px;">Tags</h3>
-      <div class="tag-cloud" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;">
-        {% if site.tags.size > 0 %}
-          {% for tag in site.tags %}
-            <span style="background-color: #f6f8fa; border: 1px solid #dde1e4; color: #24292e; padding: 4px 10px; font-size: 0.85em; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">
-              {{ tag[0] }}
-            </span>
+      <!-- RELATED POSTS -->
+
+      <section class="v3-widget">
+        <h3>Related posts</h3>
+
+        <ul class="v3-widget-list" id="v3-related-posts">
+          <li>Finding related posts...</li>
+        </ul>
+      </section>
+
+      <!-- RECENT POSTS -->
+
+      <section class="v3-widget">
+        <h3>Recent posts</h3>
+
+        <ul class="v3-widget-list">
+          {% for post in site.posts limit:5 %}
+            <li>
+              <a href="{{ site.baseurl }}{{ post.url }}">
+                {{ post.title }}
+              </a>
+            </li>
           {% endfor %}
-        {% else %}
-          <span style="color: #999; font-style: italic; font-size: 0.9em; padding-left: 5px;">No tags found</span>
-        {% endif %}
-      </div>
-    </section>
+        </ul>
+      </section>
 
+      <!-- YEARLY ARCHIVES -->
+
+      <section class="v3-widget">
+        <h3>Archives</h3>
+
+        {% assign archive_years = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+
+        <ul class="v3-widget-list">
+          {% for year in archive_years %}
+            <li>
+              <a href="{{ site.baseurl }}/blog.html?year={{ year.name }}">
+                {{ year.name }}
+              </a>
+              <span>{{ year.items.size }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+    </div>
   </aside>
 
 </div>
 
-<!-- Verified MathJax CDN distribution script powered by jsDelivr -->
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<!-- SEARCH AND RELATED POST INDEX -->
+
+<script id="v3-post-index" type="application/json">
+[
+{% for post in site.posts %}
+  {
+    "title": {{ post.title | jsonify }},
+    "url": {{ post.url | prepend: site.baseurl | jsonify }},
+    "date": {{ post.date | date: "%Y-%m-%d" | jsonify }},
+    "excerpt": {{ post.excerpt | strip_html | normalize_whitespace | jsonify }},
+    "categories": {{ post.categories | jsonify }},
+    "tags": {{ post.tags | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+{% endfor %}
+]
+</script>
+
+<!-- MATHJAX CONFIGURATION -->
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const postBody = document.querySelector(".entry");
-    if (!postBody) return;
-    let html = postBody.innerHTML;
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true
+  },
+  options: {
+    skipHtmlTags: [
+      'script', 'noscript', 'style',
+      'textarea', 'pre', 'code'
+    ]
+  }
+};
+</script>
 
-    // 1. PRE-CLEANUP: Restores text split across formatting blocks inside brackets
-    html = html.replace(/\[([^\]]+)\]/g, function(match) {
-      return match.replace(/<\/?em>/gi, '/');
-    });
+<script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  id="MathJax-script"
+  async>
+</script>
 
-    // 2. PARSE LIBRARY ENTRIES: [Title|Author|URL] -> Layout Box
-    html = html.replace(/\[([^\]|]+)\|([^\]|]+)\|([^\]\s<]+)\]/g, function(match, title, author, url) {
-      let href = url.trim().replace(/<[^>]*>/g, '');
-      if (!/^https?:\/\//i.test(href) && !href.startsWith('/')) {
-        href = 'https://' + href;
+<!-- POST LAYOUT JAVASCRIPT -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const entry = document.getElementById("v3-entry");
+  if (!entry) return;
+
+  /* -----------------------------
+     1. MEDIAWIKI-STYLE SYNTAX
+  ----------------------------- */
+
+  const syntaxPattern =
+    /\[([^\]|]+)\|([^\]|]+)\|([^\]\s<]+)\]|\[([^\]|]+)\|([^\]\s<]+)\]|==([^=]+)==|'''([^']+)'''|__([^_]+)__|\/(?![^\/\s])([^\/]+?)\/|\/([^\/\s](?:[^\/]*?[^\/\s])?)\//g;
+
+  function makeLink(text, url) {
+    const link = document.createElement("a");
+    link.textContent = text.trim();
+    link.className = "v3-mediawiki-link";
+
+    let href = url.trim();
+
+    if (!/^https?:\/\//i.test(href) &&
+        !href.startsWith("/") &&
+        !href.startsWith("#") &&
+        !href.startsWith("mailto:")) {
+      href = "https://" + href;
+    }
+
+    link.href = href;
+
+    if (/^https?:\/\//i.test(href)) {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    }
+
+    return link;
+  }
+
+  function makeResource(title, author, url) {
+    const card = document.createElement("div");
+    card.className = "v3-resource-card";
+
+    const heading = document.createElement("strong");
+    heading.textContent = title.trim();
+
+    const byline = document.createElement("span");
+    byline.textContent = "by " + author.trim();
+
+    const link = makeLink("Resource link →", url);
+    link.classList.add("v3-resource-link");
+
+    card.append(heading, byline, link);
+
+    return card;
+  }
+
+  function formatTextNode(node) {
+    const text = node.nodeValue;
+    if (!text || !text.trim()) return;
+
+    // Avoid formatting code, links and MathJax-generated content.
+    const parent = node.parentElement;
+
+    if (!parent ||
+        parent.closest("a, code, pre, script, style, textarea, .MathJax, mjx-container")) {
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    let lastIndex = 0;
+    let match;
+
+    syntaxPattern.lastIndex = 0;
+
+    while ((match = syntaxPattern.exec(text)) !== null) {
+
+      fragment.appendChild(
+        document.createTextNode(text.slice(lastIndex, match.index))
+      );
+
+      let element;
+
+      if (match[1] !== undefined) {
+        element = makeResource(match[1], match[2], match[3]);
+      } else if (match[4] !== undefined) {
+        element = makeLink(match[4], match[5]);
+      } else if (match[6] !== undefined) {
+        element = document.createElement("mark");
+        element.className = "v3-highlight";
+        element.textContent = match[6];
+      } else if (match[7] !== undefined) {
+        element = document.createElement("strong");
+        element.textContent = match[7];
+      } else if (match[8] !== undefined) {
+        element = document.createElement("u");
+        element.textContent = match[8];
+      } else if (match[9] !== undefined || match[10] !== undefined) {
+        element = document.createElement("em");
+        element.textContent = match[9] || match[10];
       }
-      return `
-        <div class="library-card" style="border: 1px solid #e0e0e0; border-left: 4px solid #007acc; padding: 15px; margin: 15px 0; background-color: #f9f9f9; display: flex; flex-direction: column; gap: 5px;">
-          <span class="book-title" style="font-weight: bold; font-size: 1.1em; color: #333;">${title.trim()}</span>
-          <span class="book-author" style="font-style: italic; color: #666; font-size: 0.95em;">by ${author.trim()}</span>
-          <a href="${href}" class="pdf-download-btn" target="_blank" style="display: inline-block; align-self: flex-start; margin-top: 5px; background-color: #007acc; color: white !important; padding: 4px 10px; text-decoration: none; font-size: 0.85em;">📥 Resource Link</a>
-        </div>
-      `;
-    });
 
-    // 3. PARSE STANDARD MEDIAWIKI LINKS: [Text|URL] -> Inline Hyperlink
-    html = html.replace(/\[([^\]|]+)\|([^\]\s<]+)\]/g, function(match, text, url) {
-      let href = url.trim().replace(/<[^>]*>/g, ''); 
-      if (!/^https?:\/\//i.test(href) && !href.startsWith('/')) {
-        href = 'https://' + href;
+      if (element) fragment.appendChild(element);
+
+      lastIndex = syntaxPattern.lastIndex;
+    }
+
+    if (lastIndex === 0) return;
+
+    fragment.appendChild(
+      document.createTextNode(text.slice(lastIndex))
+    );
+
+    node.parentNode.replaceChild(fragment, node);
+  }
+
+  const walker = document.createTreeWalker(
+    entry,
+    NodeFilter.SHOW_TEXT
+  );
+
+  const textNodes = [];
+  let textNode;
+
+  while ((textNode = walker.nextNode())) {
+    textNodes.push(textNode);
+  }
+
+  textNodes.forEach(formatTextNode);
+
+  /* -----------------------------
+     2. IMAGE CAPTIONS
+  ----------------------------- */
+
+  entry.querySelectorAll("img[title]").forEach(function(img) {
+
+    const caption = img.getAttribute("title");
+
+    if (!caption || img.closest("figure")) return;
+
+    const figure = document.createElement("figure");
+    const figcaption = document.createElement("figcaption");
+
+    img.parentNode.insertBefore(figure, img);
+    figure.appendChild(img);
+
+    figcaption.textContent = caption;
+    figure.appendChild(figcaption);
+
+  });
+
+  /* -----------------------------
+     3. TABLE OF CONTENTS
+  ----------------------------- */
+
+  const headings = entry.querySelectorAll("h2, h3");
+  const toc = document.getElementById("v3-toc");
+  const tocList = document.getElementById("v3-toc-list");
+
+  const usedIds = new Set();
+
+  headings.forEach(function(heading, index) {
+
+    if (!heading.id) {
+      let slug = heading.textContent
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-");
+
+      if (!slug) slug = "section-" + (index + 1);
+
+      let uniqueSlug = slug;
+      let suffix = 2;
+
+      while (usedIds.has(uniqueSlug) ||
+             document.getElementById(uniqueSlug)) {
+        uniqueSlug = slug + "-" + suffix++;
       }
-      return `<a href="${href}" class="mediawiki-link">${text.trim()}</a>`;
+
+      heading.id = uniqueSlug;
+    }
+
+    usedIds.add(heading.id);
+
+    const li = document.createElement("li");
+    const link = document.createElement("a");
+
+    link.href = "#" + heading.id;
+    link.textContent = heading.textContent;
+
+    if (heading.tagName === "H3") {
+      li.className = "v3-toc-subheading";
+    }
+
+    li.appendChild(link);
+    tocList.appendChild(li);
+
+  });
+
+  if (headings.length === 0) {
+    toc.hidden = true;
+  }
+
+  /* -----------------------------
+     4. READING TIME AND COMPLEXITY
+  ----------------------------- */
+
+  const plainText = entry.innerText || "";
+
+  const words = plainText.trim().split(/\s+/).filter(Boolean);
+
+  const readingMinutes = Math.max(
+    1,
+    Math.ceil(words.length / 200)
+  );
+
+  document.getElementById("v3-reading-time").textContent =
+    readingMinutes + " min read";
+
+  const sentences = plainText
+    .split(/[.!?]+/)
+    .filter(function(sentence) {
+      return sentence.trim().length > 0;
     });
 
-    // 4. PARSE HIGHLIGHTS: ==text== -> Highlight tags
-    html = html.replace(/==([^=]+)==/g, '<mark class="wiki-highlight">$1</mark>');
+  const averageSentenceLength =
+    words.length / Math.max(1, sentences.length);
 
-    // 5. PARSE SLASHES: /text/ -> Italics
-    html = html.replace(/\/(?![^<>]*>)([^\/\s][^\/]*?[^\/\s]|[^\/\s])\//g, '<em>$1</em>');
+  const longWords = words.filter(function(word) {
+    return word.replace(/[^a-z]/gi, "").length >= 7;
+  }).length;
 
-    postBody.innerHTML = html;
+  const longWordRatio =
+    longWords / Math.max(1, words.length);
 
-    // 6. PROCESS LATE X MATHEMATICAL FORMULAS
-    if (window.MathJax) {
-      window.MathJax.typesetPromise([postBody]);
+  const complexity =
+    averageSentenceLength * 0.65 +
+    longWordRatio * 100 * 0.35;
+
+  let difficulty = "Accessible";
+
+  if (complexity >= 16) difficulty = "Advanced";
+  else if (complexity >= 11) difficulty = "Moderate";
+  else if (complexity >= 7) difficulty = "Intermediate";
+
+  document.getElementById("v3-reading-difficulty").textContent =
+    difficulty + " complexity";
+
+  /* -----------------------------
+     5. POST INDEX
+  ----------------------------- */
+
+  let posts = [];
+
+  try {
+    posts = JSON.parse(
+      document.getElementById("v3-post-index").textContent
+    );
+  } catch (error) {
+    console.error("Could not load post index:", error);
+  }
+
+  function normaliseUrl(url) {
+    return url.replace(/\/+$/, "") || "/";
+  }
+
+  const currentUrl = normaliseUrl(window.location.pathname);
+
+  const currentPost = posts.find(function(post) {
+    return normaliseUrl(post.url) === currentUrl;
+  });
+
+  /* -----------------------------
+     6. RELATED POSTS
+  ----------------------------- */
+
+  const relatedContainer =
+    document.getElementById("v3-related-posts");
+
+  if (currentPost) {
+
+    const related = posts
+      .filter(function(post) {
+        return normaliseUrl(post.url) !== currentUrl;
+      })
+      .map(function(post) {
+
+        let score = 0;
+
+        currentPost.categories.forEach(function(category) {
+          if (post.categories.includes(category)) score += 3;
+        });
+
+        currentPost.tags.forEach(function(tag) {
+          if (post.tags.includes(tag)) score += 1;
+        });
+
+        return { post: post, score: score };
+
+      })
+      .filter(function(item) {
+        return item.score > 0;
+      })
+      .sort(function(a, b) {
+        return b.score - a.score ||
+          b.post.date.localeCompare(a.post.date);
+      })
+      .slice(0, 5);
+
+    relatedContainer.replaceChildren();
+
+    if (related.length === 0) {
+
+      relatedContainer.textContent = "No related posts found.";
+
+    } else {
+
+      related.forEach(function(item) {
+
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+
+        link.href = item.post.url;
+        link.textContent = item.post.title;
+
+        li.appendChild(link);
+        relatedContainer.appendChild(li);
+
+      });
+
+    }
+  }
+
+  /* -----------------------------
+     7. SEARCH AND FILTERS
+  ----------------------------- */
+
+  const searchInput = document.getElementById("v3-search");
+  const searchResults = document.getElementById("v3-search-results");
+  const searchForm = document.getElementById("v3-search-form");
+
+  const params = new URLSearchParams(window.location.search);
+
+  const categoryFilter = params.get("category");
+  const tagFilter = params.get("tag");
+  const yearFilter = params.get("year");
+
+  function renderResults(query) {
+
+    const q = (query || "").toLowerCase().trim();
+
+    searchResults.replaceChildren();
+
+    const results = posts.filter(function(post) {
+
+      const matchesQuery = !q || [
+        post.title,
+        post.excerpt,
+        post.categories.join(" "),
+        post.tags.join(" ")
+      ].join(" ").toLowerCase().includes(q);
+
+      const matchesCategory =
+        !categoryFilter || post.categories.includes(categoryFilter);
+
+      const matchesTag =
+        !tagFilter || post.tags.includes(tagFilter);
+
+      const matchesYear =
+        !yearFilter || post.date.startsWith(yearFilter);
+
+      return matchesQuery &&
+        matchesCategory &&
+        matchesTag &&
+        matchesYear;
+
+    }).slice(0, 20);
+
+    if (!q && !categoryFilter && !tagFilter && !yearFilter) {
+      return;
+    }
+
+    if (results.length === 0) {
+      searchResults.textContent = "No matching posts.";
+      return;
+    }
+
+    results.forEach(function(post) {
+
+      const link = document.createElement("a");
+      link.className = "v3-search-result";
+      link.href = post.url;
+
+      const title = document.createElement("strong");
+      title.textContent = post.title;
+
+      const excerpt = document.createElement("span");
+      excerpt.textContent = post.excerpt;
+
+      link.append(title, excerpt);
+      searchResults.appendChild(link);
+
+    });
+
+  }
+
+  searchInput.addEventListener("input", function() {
+    renderResults(searchInput.value);
+  });
+
+  searchForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+    renderResults(searchInput.value);
+  });
+
+  if (categoryFilter || tagFilter || yearFilter) {
+
+    const filterDescription =
+      categoryFilter || tagFilter || yearFilter;
+
+    searchInput.value = filterDescription;
+    renderResults("");
+
+  }
+
+  /* -----------------------------
+     8. MOBILE SIDEBAR
+  ----------------------------- */
+
+  const sidebar = document.getElementById("v3-sidebar");
+  const overlay = document.getElementById("v3-sidebar-overlay");
+  const toggle = document.getElementById("v3-menu-button");
+  const close = document.getElementById("v3-sidebar-close");
+
+  function openSidebar() {
+    sidebar.classList.add("v3-sidebar-open");
+    overlay.classList.add("v3-overlay-visible");
+    toggle.setAttribute("aria-expanded", "true");
+    close.focus();
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove("v3-sidebar-open");
+    overlay.classList.remove("v3-overlay-visible");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
+  toggle.addEventListener("click", openSidebar);
+  close.addEventListener("click", closeSidebar);
+  overlay.addEventListener("click", closeSidebar);
+
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+      closeSidebar();
+      toggle.focus();
     }
   });
+
+  sidebar.querySelectorAll("a").forEach(function(link) {
+    link.addEventListener("click", closeSidebar);
+  });
+
+});
 </script>
