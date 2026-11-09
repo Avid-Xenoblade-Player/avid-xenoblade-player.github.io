@@ -3,22 +3,62 @@ layout: default
 ---
 <div class="blog-layout-wrapper">
 
+  <!-- MAIN POST ARTICLE PANEL -->
   <main class="main-content-panel">
     <article class="post">
       <h1 style="font-size: 30px; margin-top: 0; margin-bottom: 5px; line-height: 1.2;">{{ page.title }}</h1>
 
-        <div class="date">
-          Written on {{ page.date | date: "%B %e, %Y" }}
-        </div>
+      <div class="date">
+        Written on {{ page.date | date: "%B %e, %Y" }}
+      </div>
       
       <div class="entry">
         {{ content }}
+      </div>
+
+      <!-- CATEGORY-ISOLATED CHRONOLOGICAL NAVIGATION -->
+      {% assign current_category = page.categories[0] %}
+      {% if current_category %}
+        {% assign filtered_posts = site.categories[current_category] %}
+        {% for post in filtered_posts %}
+          {% if post.url == page.url %}
+            {% assign prev_idx = forloop.index0 | plus: 1 %}
+            {% assign next_idx = forloop.index0 | minus: 1 %}
+            
+            {% if forloop.last == false %}
+              {% assign prev_post = filtered_posts[prev_idx] %}
+            {% endif %}
+            {% if forloop.first == false %}
+              {% assign next_post = filtered_posts[next_idx] %}
+            {% endif %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      <div class="PageNavigation" style="display: flex; justify-content: space-between; margin: 40px 0; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.9em;">
+        {% if prev_post %}
+          <a class="prev" href="{{ site.baseurl }}{{ prev_post.url }}" style="color: #007acc; font-weight: 500;">&laquo; Older in {{ current_category | capitalize }}: {{ prev_post.title }}</a>
+        {% else if current_category %}
+          <span style="color: #ccc;">&laquo; Oldest in {{ current_category | capitalize }}</span>
+        {% else %}
+          <span style="color: #ccc;">&laquo; Oldest Post</span>
+        {% endif %}
+
+        {% if next_post %}
+          <a class="next" href="{{ site.baseurl }}{{ next_post.url }}" style="color: #007acc; font-weight: 500;">Newer in {{ current_category | capitalize }}: {{ next_post.title }} &raquo;</a>
+        {% else if current_category %}
+          <span style="color: #ccc;">Newest in {{ current_category | capitalize }} &raquo;</span>
+        {% else %}
+          <span style="color: #ccc;">Newest Post &raquo;</span>
+        {% endif %}
       </div>
       
       {% include disqus.html %}
     </article>
   </main>
 
+  <!-- SIDEBAR WIDGET SYSTEM -->
   <aside class="sidebar-widgets">
     <section class="widget-item">
       <h3 style="border-bottom: 2px solid #007acc; padding-bottom: 6px; margin: 0; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px;">Categories</h3>
@@ -26,8 +66,8 @@ layout: default
         {% if site.categories.size > 0 %}
           {% for category in site.categories %}
             <li>
-              <span> {{ category[0] }} </span>
-              <span class="widget-count-badge"> {{ category[1].size }} </span>
+              <span>{{ category[0] }}</span>
+              <span class="widget-count-badge">{{ category[1].size }}</span>
             </li>
           {% endfor %}
         {% else %}
@@ -40,8 +80,8 @@ layout: default
       <h3 style="border-bottom: 2px solid #007acc; padding-bottom: 6px; margin: 0; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px;">Tags</h3>
       <div class="tag-cloud" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;">
         {% if site.tags.size > 0 %}
-          {% for tags in site.tags %}
-            <span style="background-color: #f6f8fa; border: 1px solid #dde1e4; color: #24292e; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">
+          {% for tag in site.tags %}
+            <span style="background-color: #f6f8fa; border: 1px solid #dde1e4; color: #24292e; padding: 4px 10px; font-size: 0.85em; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">
               {{ tag[0] }}
             </span>
           {% endfor %}
@@ -51,9 +91,9 @@ layout: default
       </div>
     </section>
 
-    <section></section>
   </aside>
 
+</div>
 
 <!-- Verified MathJax CDN distribution script powered by jsDelivr -->
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
@@ -76,10 +116,10 @@ layout: default
         href = 'https://' + href;
       }
       return `
-        <div class="library-card" style="border: 1px solid #e0e0e0; border-left: 4px solid #007acc; padding: 15px; margin: 15px 0; background-color: #f9f9f9; border-radius: 4px; display: flex; flex-direction: column; gap: 5px;">
+        <div class="library-card" style="border: 1px solid #e0e0e0; border-left: 4px solid #007acc; padding: 15px; margin: 15px 0; background-color: #f9f9f9; display: flex; flex-direction: column; gap: 5px;">
           <span class="book-title" style="font-weight: bold; font-size: 1.1em; color: #333;">${title.trim()}</span>
           <span class="book-author" style="font-style: italic; color: #666; font-size: 0.95em;">by ${author.trim()}</span>
-          <a href="${href}" class="pdf-download-btn" target="_blank" style="display: inline-block; align-self: flex-start; margin-top: 5px; background-color: #007acc; color: white !important; padding: 4px 10px; border-radius: 4px; text-decoration: none; font-size: 0.85em;">📥 Resource Link</a>
+          <a href="${href}" class="pdf-download-btn" target="_blank" style="display: inline-block; align-self: flex-start; margin-top: 5px; background-color: #007acc; color: white !important; padding: 4px 10px; text-decoration: none; font-size: 0.85em;">📥 Resource Link</a>
         </div>
       `;
     });
