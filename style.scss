@@ -283,6 +283,58 @@ footer {
   text-align: center;
 }
 
+.blog-layout-wrapper {
+	display: grid;
+	grid-template-columns: 3fr 1fr;
+	gap: 40px;
+	width: 100%;
+	margin-top: 20px;
+
+	@include mobile {
+		grid-template-columns: 1fr;
+		gap: 45px;
+	}
+}
+
+.sidebar-widgets {
+	min-width: 240px;
+	display: flex;
+	flex-direction: column;
+	gap: 35px;
+	border-left: 1px solid #232323;
+	padding-left: 25px;
+
+	@include mobile {
+		border-left: none;
+		padding-left: 0;
+		border-top: 1px solid #232323;
+		padding-top: 30px;
+	}
+}
+
+.widget-list {
+	list-style: none;
+	padding: 0;
+	margin: 10px 0 0 0 ;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+
+	li {
+		display: flex;
+		justify-content: space-between;
+		font-size: 0.95em;
+		color: #bcbcbc;
+	}
+}
+
+.widget-count-badge {
+	background: #232323;
+	padding: 2px 8px;
+	font-size: 0.8em;
+	color: #787878;
+	font-weight: bold;
+}
 // Settled on moving the import of syntax highlighting to the bottom of the CSS
 // ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start
 @import "highlights";
