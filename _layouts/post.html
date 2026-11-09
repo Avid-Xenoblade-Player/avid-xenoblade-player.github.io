@@ -1,20 +1,59 @@
 ---
 layout: default
 ---
+<div class="blog-layout-wrapper">
 
-<article class="post">
-  <h1>{{ page.title }}</h1>
+  <main class="main-content-panel">
+    <article class="post">
+      <h1 style="font-size: 30px; margin-top: 0; margin-bottom: 5px; line-height: 1.2;">{{ page.title }}</h1>
 
-  <div class="entry">
-    {{ content }}
-  </div>
+        <div class="date">
+          Written on {{ page.date | date: "%B %e, %Y" }}
+        </div>
+      
+      <div class="entry">
+        {{ content }}
+      </div>
+      
+      {% include disqus.html %}
+    </article>
+  </main>
 
-  <div class="date">
-    Written on {{ page.date | date: "%B %e, %Y" }}
-  </div>
+  <aside class="sidebar-widgets">
+    <section class="widget-item">
+      <h3 style="border-bottom: 2px solid #007acc; padding-bottom: 6px; margin: 0; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px;">Categories</h3>
+      <ul class="widget-list">
+        {% if site.categories.size > 0 %}
+          {% for category in site.categories %}
+            <li>
+              <span> {{ category[0] }} </span>
+              <span class="widget-count-badge"> {{ category[1].size }} </span>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li style="color: #999; font-style: italic; font-size: 0.9em; padding-left: 5px;">No categories assigned</li>
+        {% endif %}
+      </ul>
+    </section>
 
-  {% include disqus.html %}
-</article>
+    <section class="widget-item">
+      <h3 style="border-bottom: 2px solid #007acc; padding-bottom: 6px; margin: 0; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px;">Tags</h3>
+      <div class="tag-cloud" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;">
+        {% if site.tags.size > 0 %}
+          {% for tags in site.tags %}
+            <span style="background-color: #f6f8fa; border: 1px solid #dde1e4; color: #24292e; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">
+              {{ tag[0] }}
+            </span>
+          {% endfor %}
+        {% else %}
+          <span style="color: #999; font-style: italic; font-size: 0.9em; padding-left: 5px;">No tags found</span>
+        {% endif %}
+      </div>
+    </section>
+
+    <section></section>
+  </aside>
+
 
 <!-- Verified MathJax CDN distribution script powered by jsDelivr -->
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
