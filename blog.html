@@ -66,66 +66,72 @@ permalink: /blog.html
 </main>
 
 <script>
+<script>
 document.addEventListener("DOMContentLoaded", function () {
     const params = new URLSearchParams(window.location.search);
 
     const year = params.get("year");
-    const category = params.get("category")?.toLowerCase();
-    const tag = params.get("tag")?.toLowerCase();
+    const category = params.get("category")?.trim().toLowerCase();
+    const tag = params.get("tag")?.trim().toLowerCase();
 
     const search = document.getElementById("blog-search");
     const description = document.getElementById("filter-description");
-    const posts = [...document.querySelectorAll(".archive-post")];
+    const posts = Array.from(document.querySelectorAll(".archive-post"));
     const noResults = document.getElementById("no-results");
 
-    const filters = [];
-
-    if (year) filters.push("Year: " + year);
-    if (category) filters.push("Category: " + category);
-    if (tag) filters.push("Tag: " + tag);
-
-    description.textContent = filters.length
-        ? "Filtering by " + filters.join(" | ")
-        : "All posts";
-
     function filterPosts() {
-        const query = search.value.toLowerCase().trim();
+        const query = search.value.trim().toLowerCase();
         let visible = 0;
 
         posts.forEach(post => {
-            const matchesYear =
-                !year || post.dataset.year === year;
+            const postYear = post.dataset.year;
 
-            const categories =
-                post.dataset.categories.split("|").filter(Boolean);
+            const postCategories = (post.dataset.categories || "")
+                .split("|")
+                .map(x => x.trim().toLowerCase())
+                .filter(Boolean);
 
-            const tags =
-                post.dataset.tags.split("|").filter(Boolean);
+            const postTags = (post.dataset.tags || "")
+                .split("|")
+                .map(x => x.trim().toLowerCase())
+                .filter(Boolean);
 
+            const postSearch = post.dataset.search || "";
+
+            const matchesYear = !year || postYear === year;
             const matchesCategory =
-                !category || categories.includes(category);
-
+                !category || postCategories.includes(category);
             const matchesTag =
-                !tag || tags.includes(tag);
-
+                !tag || postTags.includes(tag);
             const matchesSearch =
-                !query || post.dataset.search.includes(query);
+                !query || postSearch.includes(query);
 
-            const show =
+            const matches =
                 matchesYear &&
                 matchesCategory &&
                 matchesTag &&
                 matchesSearch;
 
-            post.hidden = !show;
+            post.hidden = !matches;
 
-            if (show) visible++;
+            // Explicitly enforce visibility, even if other CSS interferes.
+            post.style.display = matches ? "" : "none";
+
+            if (matches) visible++;
         });
 
         noResults.hidden = visible !== 0;
+        noResults.style.display = visible === 0 ? "" : "none";
+
+        description.textContent =
+            (year ? "Year: " + year + " | " : "") +
+            (category ? "Category: " + category + " | " : "") +
+            (tag ? "Tag: " + tag + " | " : "") +
+            visible + " posts found";
     }
 
     search.addEventListener("input", filterPosts);
+
     filterPosts();
 });
 </script>
