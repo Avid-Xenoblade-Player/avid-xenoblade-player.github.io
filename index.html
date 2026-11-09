@@ -2,17 +2,55 @@
 layout: default
 ---
 
-<div class="posts">
-  {% for post in site.posts %}
-    <article class="post">
+<div class="blog-layout-wrapper">
+  <main class="main-content-panel">
+    <div class="posts">
+      {% for post in site.posts %}
+        <article class="post">
+          <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
+          <div class="entry">
+            {{ post.excerpt | truncatewords: 51 }}
+          </div>
+          <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+        </article>
+      {% endfor %}
+    </div>
+  </main>
 
-      <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
+    <aside class="sidebar-widgets">
+    <section class="widget-item">
+      <h3 style="border-bottom: 2px solid #007acc; padding-bottom: 6px; margin: 0; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px;">Categories</h3>
+      <ul class="widget-list">
+        {% if site.categories.size > 0 %}
+          {% for category in site.categories %}
+            <li>
+              <span> {{ category[0] }} </span>
+              <span class="widget-count-badge"> {{ category[1].size }} </span>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li style="color: #999; font-style: italic; font-size: 0.9em; padding-left: 5px;">No categories assigned</li>
+        {% endif %}
+      </ul>
+    </section>
 
-      <div class="entry">
-        {{ post.excerpt }}
+    <section class="widget-item">
+      <h3 style="border-bottom: 2px solid #007acc; padding-bottom: 6px; margin: 0; font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.5px;">Tags</h3>
+      <div class="tag-cloud" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;">
+        {% if site.tags.size > 0 %}
+          {% for tags in site.tags %}
+            <span style="background-color: #f6f8fa; border: 1px solid #dde1e4; color: #24292e; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">
+              {{ tag[0] }}
+            </span>
+          {% endfor %}
+        {% else %}
+          <span style="color: #999; font-style: italic; font-size: 0.9em; padding-left: 5px;">No tags found</span>
+        {% endif %}
       </div>
+    </section>
 
-      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
-    </article>
-  {% endfor %}
+    <section></section>
+  </aside>
+
+  
 </div>
