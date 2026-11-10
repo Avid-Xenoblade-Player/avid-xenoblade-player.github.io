@@ -1,6 +1,9 @@
 ---
 layout: post
 title: TESTING LAB!!
+date: 1900-1-1
+categories: [Meta]
+tags: [metablogging]
 ---
 
 hello this is my testing lab kindly disregard<br>
